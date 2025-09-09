@@ -1,0 +1,39 @@
+[project]
+name = "selectel-ticketing-system"
+version = "0.1.0"
+description = "Ticketing system for Selectel"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "fastapi==0.68.0",
+    "uvicorn==0.15.0",
+    "alembic==1.6.5",
+    "sqlalchemy==1.3.24",
+    "databases==0.4.3",
+    "asyncpg==0.24.0",
+    "psycopg2==2.9.1",
+    "pydantic[email]==1.8.2",
+    "orjson==3.6.1",
+    "aioredis==2.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy",
+    "pylint",
+    "flake8",
+    "pytest"
+]
+
+[tool.poetry.group.dev.dependencies]
+mypy = "*"
+pylint = "*"
+flake8 = "*"
+pytest = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
