@@ -51,16 +51,28 @@
 
 ### Настройка виртуального окружения
 
-Необходима установка `pipenv`:
+Проект использует Poetry для управления зависимостями. Установите Poetry если еще не установлен:
 
 ```bash
- pip install pipenv
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-В корневой директории запустить команду:  
+Или через pip:
 
 ```bash
-pipenv install --ignore-pipfile
+pip install poetry
+```
+
+Установите зависимости:
+
+```bash
+poetry install
+```
+
+Активируйте виртуальное окружение:
+
+```bash
+poetry shell
 ```
 
 ### Переменные окружения
@@ -75,10 +87,10 @@ REDIS_PORT='<порт для подключения к Redis>'
 
 **Данные операции необходимо выполнять из директории `src`**
 
-1. Создание миграций:
+1. Создание миграций (используя Poetry):
 
    ```bash
-   alembic -c ./models/alembic.ini revision -m "some message" --autogenerate
+   poetry run alembic -c ./models/alembic.ini revision -m "some message" --autogenerate
    ```
 
    Данная команда сгенерирует новую миграцию, но не применит её к БД.
@@ -86,26 +98,42 @@ REDIS_PORT='<порт для подключения к Redis>'
 2. Применение миграции к БД:
 
    ```bash
-   alembic -c ./models/alembic.ini upgrade head
+   poetry run alembic -c ./models/alembic.ini upgrade head
    ```
 
 ### Запуск проекта
 
-1. Создать файл `.env`  
-2. Запуск сервисов `PostgreSQL`, `Redis`  
+Проект полностью контейнеризован и запускается одной командой:
 
-    ```bash
-    sudo docker-compose up -d
-    ```  
+```bash
+docker-compose up --build
+```
 
-3. После того как запустится `PostgreSQL`, `Redis`:  
-    В корневой директории запустить:  
+Эта команда:
 
-    ```bash
-    ./entrypoint.sh
-    ```
+1. Соберет Docker-образ приложения
+2. Запустит PostgreSQL, Redis и само приложение
+3. Healthchecks обеспечат правильный порядок запуска
+4. Приложение автоматически применит миграции и запустится
+
+После запуска приложение будет доступно по адресу: <http://localhost:8000>
+
+Документация API:
+
+* Swagger UI: <http://localhost:8000/api/openapi>
+* ReDoc: <http://localhost:8000/api/redoc>
+
+#### Переменные окружения
+
+Создайте файл `.env` на основе `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Отредактируйте `.env` файл при необходимости.
 
 ## Полезные материалы
 
 [Пишем и тестируем миграции БД с Alembic](https://habr.com/ru/company/yandex/blog/511892/)  
-[Pipenv: руководство по инструменту](https://webdevblog.ru/pipenv-rukovodstvo-po-novomu-instrumentu-python/)
+[Poetry: документация](https://python-poetry.org/docs/)
