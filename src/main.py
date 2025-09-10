@@ -67,7 +67,7 @@ async def shutdown():
 # Добавляем корневой маршрут
 @app.get("/")
 async def root():
-    return {"message": "Selectel Ticketing System API is running"}
+    return {"message": "Ticketing System API is running"}
 
 
 # Подключаем роутер к серверу, указав префикс /v1/<service>
