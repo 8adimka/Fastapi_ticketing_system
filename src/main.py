@@ -64,6 +64,12 @@ async def shutdown():
     await postgresql.database.disconnect()
 
 
+# Добавляем корневой маршрут
+@app.get("/")
+async def root():
+    return {"message": "Selectel Ticketing System API is running"}
+
+
 # Подключаем роутер к серверу, указав префикс /v1/<service>
 # Теги указываем для удобства навигации по документации
 app.include_router(ticket.router, prefix="/v1/ticket", tags=["ticket"])

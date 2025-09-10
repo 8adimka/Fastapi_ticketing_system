@@ -2,14 +2,13 @@ from typing import Optional
 
 from pydantic import (
     BaseSettings,
-    RedisDsn,
 )
 
 
 class RedisSettings(BaseSettings):
-    host: str
-    port: str
-    cache_dsn: Optional[RedisDsn]
+    host: str = "redis"
+    port: str = "6379"
+    cache_dsn: Optional[str]
 
     CACHE_EXPIRE_IN_SECONDS: int = 300
 
@@ -19,3 +18,5 @@ class RedisSettings(BaseSettings):
 
     class Config:
         env_prefix = "REDIS_"
+        env_file = ".env"
+        env_file_encoding = "utf-8"
