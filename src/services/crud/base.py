@@ -1,9 +1,9 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from uuid import UUID
 
-from aioredis import Redis
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
+from redis.asyncio import Redis
 from sqlalchemy.orm import Session
 
 from src.core.modules import Cache

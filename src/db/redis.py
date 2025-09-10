@@ -1,9 +1,9 @@
-import aioredis
+from redis.asyncio import ConnectionPool, Redis
 
-redis: aioredis.Redis = None  # type: ignore
-pool: aioredis.ConnectionPool = None  # type: ignore
+redis: Redis = None  # type: ignore
+pool: ConnectionPool = None  # type: ignore
 
 
 # Функция понадобится при внедрении зависимостей
-async def get_redis() -> aioredis.Redis:
+async def get_redis() -> Redis:
     return redis

@@ -1,11 +1,11 @@
 import logging
 from logging import config as logging_config
 
-import aioredis
 import databases
 import uvicorn
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import ORJSONResponse
+from redis.asyncio import ConnectionPool, Redis
 
 from src.api.v1 import comment, ticket
 from src.core import logger
@@ -48,12 +48,12 @@ async def startup():
     # Подключаемся к базам при старте сервера
     # Подключиться можем при работающем event-loop
     # Поэтому логика подключения происходит в асинхронной функции
-    redis.pool = aioredis.ConnectionPool.from_url(
-        app_config.redis_db.cache_dsn,
+    redis.pool = ConnectionPool.from_url(
+        app_config.redis_db.cache_dsn or "redis://redis:6379/0",
         decode_responses=True,
     )
 
-    redis.redis = aioredis.Redis(connection_pool=redis.pool)
+    redis.redis = Redis(connection_pool=redis.pool)
     postgresql.database = await databases.Database(app_config.db.pg_dsn).connect()
 
 

@@ -8,9 +8,9 @@ from typing import (
 )
 from uuid import UUID
 
-from aioredis import Redis
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
+from redis.asyncio import Redis
 from sqlalchemy.orm import Session
 
 from src.core import exceptions

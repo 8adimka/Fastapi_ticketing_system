@@ -15,7 +15,7 @@ dependencies = [
     "databases==0.4.3",
     "asyncpg==0.24.0",
     "psycopg2==2.9.1",
-    "aioredis==2.0.0",
+    "redis==4.5.4",
     "pydantic[email]==1.8.2",
     "orjson==3.6.1"
 ]
