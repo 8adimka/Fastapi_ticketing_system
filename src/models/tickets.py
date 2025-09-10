@@ -13,7 +13,6 @@ from src.models.base_mixins import AuditMixin, BaseMixin, TimestampMixin
 
 # Этот импорт нужен для связи one-to-many для модели Ticket
 from src.models.comments import Comment  # noqa: F401
-from src.models.history_meta import Versioned
 
 
 class TicketStatus(enum.Enum):
@@ -36,7 +35,7 @@ class TicketMixin(TimestampMixin, AuditMixin):
     status = Column(Enum(TicketStatus), nullable=False, default=TicketStatus.OPEN)
 
 
-class Ticket(Versioned, Base, BaseMixin, TicketMixin):
+class Ticket(Base, BaseMixin, TicketMixin):
     """Ticket model
 
     links: one-to-many with Comments model

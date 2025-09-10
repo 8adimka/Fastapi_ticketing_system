@@ -48,15 +48,16 @@ class TicketBase(BaseModel):
 # Properties to receive on Ticket creation
 class TicketCreate(TicketBase):
     title: str
-    description: Optional[str]
+    description: Optional[str] = None
     email: EmailStr
 
     created_by: str
-    updated_by: Optional[str]
+    updated_by: Optional[str] = None
 
     def __init__(self, **data: Any):
         super().__init__(**data)
-        self.updated_by = self.created_by
+        if self.updated_by is None:
+            self.updated_by = self.created_by
 
 
 class TicketUpdate(TicketBase):
@@ -79,4 +80,4 @@ class Ticket(TicketInDBBase):
 class TicketFull(TicketInDBBase):
     updated_at: Optional[datetime]
     description: Optional[str]
-    comment: List[Comment] = Field(..., alias="comments")
+    comment: List[Comment] = Field(default_factory=list, alias="comments")

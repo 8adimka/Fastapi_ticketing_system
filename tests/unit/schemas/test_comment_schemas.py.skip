@@ -1,0 +1,106 @@
+from datetime import datetime
+from uuid import uuid4
+
+from src.schemas.comment import (
+    Comment,
+    CommentBase,
+    CommentCreate,
+    CommentFull,
+    CommentUpdate,
+)
+
+
+class TestCommentSchemas:
+    """Test cases for Comment Pydantic schemas"""
+
+    def test_comment_base_schema(self):
+        """Test CommentBase schema"""
+        data = {"body": "Test comment body"}
+        comment = CommentBase(**data)
+
+        assert comment.body == "Test comment body"
+
+    def test_comment_create_schema(self):
+        """Test CommentCreate schema"""
+        ticket_id = uuid4()
+        data = {
+            "email": "commenter@example.com",
+            "body": "Test comment body",
+            "ticket_id": ticket_id,
+            "created_by": "test_user",
+            "updated_by": "test_user",
+        }
+        comment = CommentCreate(**data)
+
+        assert comment.email == "commenter@example.com"
+        assert comment.body == "Test comment body"
+        assert comment.ticket_id == ticket_id
+        assert comment.created_by == "test_user"
+        assert comment.updated_by == "test_user"
+
+    def test_comment_update_schema(self):
+        """Test CommentUpdate schema"""
+        data = {"body": "Updated comment body", "updated_by": "updater_user"}
+        comment = CommentUpdate(**data)
+
+        assert comment.body == "Updated comment body"
+        assert comment.updated_by == "updater_user"
+
+    def test_comment_schema(self):
+        """Test Comment schema"""
+        comment_id = uuid4()
+        ticket_id = uuid4()
+        created_at = datetime.now()
+
+        data = {
+            "id": comment_id,
+            "email": "commenter@example.com",
+            "body": "Test comment body",
+            "created_at": created_at,
+            "ticket_id": ticket_id,
+        }
+        comment = Comment(**data)
+
+        assert comment.id == comment_id
+        assert comment.email == "commenter@example.com"
+        assert comment.body == "Test comment body"
+        assert comment.created_at == created_at
+        assert comment.ticket_id == ticket_id
+
+    def test_comment_full_schema(self):
+        """Test CommentFull schema"""
+        comment_id = uuid4()
+        created_at = datetime.now()
+        updated_at = datetime.now()
+
+        data = {
+            "id": comment_id,
+            "email": "commenter@example.com",
+            "body": "Test comment body",
+            "created_at": created_at,
+            "updated_at": updated_at,
+            "created_by": "test_user",
+            "updated_by": "test_user",
+        }
+        comment = CommentFull(**data)
+
+        assert comment.id == comment_id
+        assert comment.email == "commenter@example.com"
+        assert comment.body == "Test comment body"
+        assert comment.created_at == created_at
+        assert comment.updated_at == updated_at
+        assert comment.created_by == "test_user"
+        assert comment.updated_by == "test_user"
+
+    def test_comment_create_auto_updated_by(self):
+        """Test that CommentCreate automatically sets updated_by from created_by"""
+        ticket_id = uuid4()
+        data = {
+            "email": "commenter@example.com",
+            "body": "Test comment",
+            "ticket_id": ticket_id,
+            "created_by": "test_user",
+        }
+        comment = CommentCreate(**data)
+
+        assert comment.updated_by == "test_user"

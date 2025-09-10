@@ -1,0 +1,84 @@
+from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+from pydantic import BaseModel
+
+from src.core.modules import prepare_list_items_to_cache
+
+
+class MockSchema(BaseModel):
+    """Mock schema for testing"""
+
+    name: str
+    value: int
+
+
+class TestModulesUtils:
+    """Test cases for utility functions in modules.py"""
+
+    @pytest.mark.asyncio
+    async def test_prepare_list_items_to_cache_basic(self):
+        """Test prepare_list_items_to_cache with basic data types"""
+        test_data = [
+            MockSchema(name="test1", value=100),
+            MockSchema(name="test2", value=200),
+        ]
+
+        result = await prepare_list_items_to_cache(test_data)
+
+        assert len(result) == 2
+        assert result[0]["name"] == "test1"
+        assert result[0]["value"] == 100
+        assert result[1]["name"] == "test2"
+        assert result[1]["value"] == 200
+
+    def test_prepare_list_items_to_cache_empty(self):
+        """Test prepare_list_items_to_cache with empty list"""
+        result = prepare_list_items_to_cache([])
+        assert result == []
+
+    @pytest.mark.asyncio
+    async def test_cache_get_from_cache_mock(self):
+        """Test Cache.get_from_cache with mocked database"""
+        from src.core.modules import Cache
+
+        # Mock database and model
+        mock_db = AsyncMock()
+        mock_db.get.return_value = None
+
+        mock_model = MagicMock()
+        mock_model.parse_obj.return_value = "parsed_object"
+
+        cache = Cache(mock_db)
+        result = await cache.get_from_cache("test_id", mock_model)
+
+        assert result is None
+        mock_db.get.assert_awaited_once_with("test_id")
+
+    @pytest.mark.asyncio
+    async def test_cache_delete_from_cache_mock(self):
+        """Test Cache.delete_from_cache with mocked database"""
+        from src.core.modules import Cache
+
+        mock_db = AsyncMock()
+        cache = Cache(mock_db)
+
+        await cache.delete_from_cache("test_id")
+
+        mock_db.delete.assert_awaited_once_with("test_id")
+
+    def test_page_class_initialization(self):
+        """Test Page class initialization"""
+        from src.core.modules import Page
+
+        page = Page(size=20, number=2)
+        assert page.size == 20
+        assert page.number == 2
+
+    def test_page_class_defaults(self):
+        """Test Page class default values"""
+        from src.core.modules import Page
+
+        page = Page()
+        assert page.size == 10
+        assert page.number == 0

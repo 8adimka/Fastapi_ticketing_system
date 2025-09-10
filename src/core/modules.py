@@ -12,10 +12,10 @@ from fastapi import Query
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
-from src.core.config.app_settings import AppSettings
+from src.core.config.app_settings import get_settings
 from src.db.postgresql import Base
 
-app_config = AppSettings()
+app_config = get_settings()
 ModelType = TypeVar("ModelType", bound=Base)
 SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
@@ -25,7 +25,7 @@ class Page:
     def __init__(
         self,
         size: int = Query(10, alias="page[size]", gt=0, le=100),
-        number: int = Query(0, alias="page[number]", gt=0),
+        number: int = Query(1, alias="page[number]", gt=0),
     ):
         self.size = size
         self.number = number

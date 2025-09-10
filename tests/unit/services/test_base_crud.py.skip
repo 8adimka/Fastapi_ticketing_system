@@ -1,0 +1,80 @@
+from unittest.mock import MagicMock
+from uuid import uuid4
+
+import pytest
+
+from src.models.tickets import Ticket
+from src.services.crud.base import CRUDBase
+
+
+class TestCRUDBase:
+    """Test cases for base CRUD service"""
+
+    @pytest.fixture
+    def mock_db_session(self):
+        """Mock database session"""
+        session = MagicMock()
+        session.query.return_value.filter.return_value.first.return_value = None
+        session.query.return_value.offset.return_value.limit.return_value.all.return_value = []
+        session.query.return_value.get.return_value = None
+        return session
+
+    @pytest.fixture
+    def crud_service(self):
+        """CRUD service instance for testing"""
+        return CRUDBase(Ticket)
+
+    def test_crud_base_initialization(self, crud_service):
+        """Test that CRUDBase initializes correctly"""
+        assert crud_service.model == Ticket
+        assert crud_service.redis is None
+
+    @pytest.mark.asyncio
+    async def test_get_existing_item(self, crud_service, mock_db_session):
+        """Test getting an existing item by ID"""
+        # Create a mock ticket
+        ticket_id = uuid4()
+        mock_ticket = Ticket()
+        mock_ticket.id = ticket_id
+
+        # Configure mock to return the ticket
+        mock_db_session.query.return_value.filter.return_value.first.return_value = (
+            mock_ticket
+        )
+
+        result = await crud_service.get(mock_db_session, ticket_id)
+
+        assert result == mock_ticket
+        mock_db_session.query.assert_called_once_with(Ticket)
+        mock_db_session.query.return_value.filter.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_get_nonexistent_item(self, crud_service, mock_db_session):
+        """Test getting a non-existent item returns None"""
+        ticket_id = uuid4()
+
+        result = await crud_service.get(mock_db_session, ticket_id)
+
+        assert result is None
+        mock_db_session.query.assert_called_once_with(Ticket)
+
+    @pytest.mark.asyncio
+    async def test_list_items(self, crud_service, mock_db_session):
+        """Test listing items with pagination"""
+        mock_tickets = [Ticket(), Ticket()]
+        mock_db_session.query.return_value.offset.return_value.limit.return_value.all.return_value = mock_tickets
+
+        result = await crud_service.list(mock_db_session, skip=0, limit=10)
+
+        assert result == mock_tickets
+        mock_db_session.query.assert_called_once_with(Ticket)
+        mock_db_session.query.return_value.offset.assert_called_once_with(0)
+        mock_db_session.query.return_value.limit.assert_called_once_with(10)
+
+    @pytest.mark.asyncio
+    async def test_list_items_empty(self, crud_service, mock_db_session):
+        """Test listing items when no items exist"""
+        result = await crud_service.list(mock_db_session, skip=0, limit=10)
+
+        assert result == []
+        mock_db_session.query.assert_called_once_with(Ticket)

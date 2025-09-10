@@ -50,8 +50,7 @@ class TicketService(
     async def list(
         self, db: Session, *, skip: int = 0, limit: int = 100
     ) -> List[ticket_model.Ticket]:
-        (
-            """ List of tickets
+        """List of tickets
 
         Args:
             db (Session): SQLAlchemy Session
@@ -61,8 +60,6 @@ class TicketService(
         Returns:
             List[ticket_model.Ticket]: List of tickets
         """
-            """  """
-        )
         return await super().list(db, skip=skip, limit=limit)
 
     async def create(

@@ -9,14 +9,14 @@ from redis.asyncio import ConnectionPool, Redis
 
 from src.api.v1 import comment, ticket
 from src.core import logger
-from src.core.config.app_settings import AppSettings
+from src.core.config.app_settings import get_settings
 from src.db import postgresql, redis
 
 # Применяем настройки логирования
 logging_config.dictConfig(logger.LOGGING)
 
 # Настройки приложения
-app_config = AppSettings()
+app_config = get_settings()
 
 
 app = FastAPI(

@@ -1,0 +1,54 @@
+import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+
+from src.db.postgresql import Base
+
+
+# Create test database
+@pytest.fixture(scope="session")
+def test_engine():
+    # Use SQLite for testing instead of PostgreSQL
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(bind=engine)
+    yield engine
+    Base.metadata.drop_all(bind=engine)
+
+
+# Create test session
+@pytest.fixture(scope="function")
+def test_session(test_engine):
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
+
+
+# Common test data
+@pytest.fixture
+def sample_ticket_data():
+    return {
+        "title": "Test Ticket",
+        "description": "Test description",
+        "email": "test@example.com",
+        "status": "open",
+        "created_by": "test_user",
+        "updated_by": "test_user",
+    }
+
+
+@pytest.fixture
+def sample_comment_data():
+    return {
+        "email": "commenter@example.com",
+        "body": "Test comment",
+        "created_by": "commenter",
+        "updated_by": "commenter",
+    }

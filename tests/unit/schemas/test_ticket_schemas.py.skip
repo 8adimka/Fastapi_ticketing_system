@@ -1,0 +1,102 @@
+from datetime import datetime
+from uuid import uuid4
+
+from src.schemas.ticket import (
+    Ticket,
+    TicketBase,
+    TicketCreate,
+    TicketFull,
+    TicketStatus,
+    TicketUpdate,
+)
+
+
+class TestTicketSchemas:
+    """Test cases for Ticket Pydantic schemas"""
+
+    def test_ticket_base_schema(self):
+        """Test TicketBase schema"""
+        data = {"status": TicketStatus.OPEN}
+        ticket = TicketBase(**data)
+
+        assert ticket.status == TicketStatus.OPEN
+
+    def test_ticket_create_schema(self):
+        """Test TicketCreate schema"""
+        data = {
+            "title": "Test Ticket",
+            "description": "Test description",
+            "email": "test@example.com",
+            "status": TicketStatus.OPEN,
+            "created_by": "test_user",
+        }
+        ticket = TicketCreate(**data)
+
+        assert ticket.title == "Test Ticket"
+        assert ticket.description == "Test description"
+        assert ticket.email == "test@example.com"
+        assert ticket.status == TicketStatus.OPEN
+        assert ticket.created_by == "test_user"
+        assert ticket.updated_by == "test_user"  # Should be set automatically
+
+    def test_ticket_update_schema(self):
+        """Test TicketUpdate schema"""
+        data = {"status": TicketStatus.CLOSED, "updated_by": "updater_user"}
+        ticket = TicketUpdate(**data)
+
+        assert ticket.status == TicketStatus.CLOSED
+        assert ticket.updated_by == "updater_user"
+
+    def test_ticket_schema(self):
+        """Test Ticket schema"""
+        ticket_id = uuid4()
+        created_at = datetime.now()
+
+        data = {
+            "id": ticket_id,
+            "title": "Test Ticket",
+            "created_at": created_at,
+            "status": TicketStatus.OPEN,
+        }
+        ticket = Ticket(**data)
+
+        assert ticket.id == ticket_id
+        assert ticket.title == "Test Ticket"
+        assert ticket.created_at == created_at
+        assert ticket.status == TicketStatus.OPEN
+
+    def test_ticket_full_schema(self):
+        """Test TicketFull schema"""
+        ticket_id = uuid4()
+        created_at = datetime.now()
+        updated_at = datetime.now()
+
+        data = {
+            "id": ticket_id,
+            "title": "Test Ticket",
+            "description": "Test description",
+            "created_at": created_at,
+            "updated_at": updated_at,
+            "status": TicketStatus.OPEN,
+            "comment": [],  # Field is named 'comment' with alias 'comments'
+        }
+        ticket = TicketFull(**data)
+
+        assert ticket.id == ticket_id
+        assert ticket.title == "Test Ticket"
+        assert ticket.description == "Test description"
+        assert ticket.created_at == created_at
+        assert ticket.updated_at == updated_at
+        assert ticket.status == TicketStatus.OPEN
+        assert ticket.comment == []  # Field is named 'comment'
+
+    def test_ticket_create_auto_updated_by(self):
+        """Test that TicketCreate automatically sets updated_by from created_by"""
+        data = {
+            "title": "Test Ticket",
+            "email": "test@example.com",
+            "created_by": "test_user",
+        }
+        ticket = TicketCreate(**data)
+
+        assert ticket.updated_by == "test_user"

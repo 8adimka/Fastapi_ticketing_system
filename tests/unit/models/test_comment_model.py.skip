@@ -1,0 +1,38 @@
+from datetime import datetime
+from uuid import UUID, uuid4
+
+from src.models.comments import Comment
+
+
+class TestCommentModel:
+    """Test cases for Comment model"""
+
+    def test_comment_creation(self):
+        """Test that Comment model can be created with required fields"""
+        comment = Comment()
+        comment.email = "commenter@example.com"
+        comment.body = "Test comment body"
+        comment.created_by = "test_user"
+        comment.updated_by = "test_user"
+        comment.ticket_id = uuid4()
+
+        assert comment.email == "commenter@example.com"
+        assert comment.body == "Test comment body"
+        assert comment.created_by == "test_user"
+        assert comment.updated_by == "test_user"
+        assert isinstance(comment.ticket_id, UUID)
+        assert isinstance(comment.id, UUID)
+        assert isinstance(comment.created_at, datetime)
+        assert isinstance(comment.updated_at, datetime)
+
+    def test_comment_repr(self):
+        """Test Comment string representation"""
+        comment = Comment()
+        comment.email = "commenter@example.com"
+        comment.body = "Test comment"
+        comment.created_by = "test_user"
+        comment.updated_by = "test_user"
+        comment.ticket_id = uuid4()
+
+        assert "Comment" in str(comment)
+        assert str(comment.id) in str(comment)

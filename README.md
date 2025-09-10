@@ -1,4 +1,4 @@
-# Catalog service
+# Ticketing System API
 
 ## Содержание
 
@@ -46,7 +46,7 @@
 - `models` — содержит классы, описывающие бизнес-сущности
 - `schemas` - содержит модели отвечающие за валидацию тела запроса.
 - `services` — главное в сервисе. В этом модуле находится реализация всей бизнес-логики.
-  Таким образом она отделена от транспорта. Благодаря такому разделению,  будет легче добавлять новые типы транспортов в сервис.
+  Благодаря такому разделению,  будет легче добавлять новые типы в сервис.
 
 ## Работа с проектом
 
@@ -202,7 +202,61 @@ curl -X DELETE "http://localhost:8000/v1/ticket/{ticket_id}" \
 - Из `answered` → `wait_answer` или `closed`
 - Из `closed` - нельзя изменить статус или добавить комментарий
 
+## Тестирование
+
+Проект использует pytest для модульного тестирования. Тесты расположены в директории `tests/`.
+
+### Запуск тестов
+
+```bash
+# Запуск всех тестов с покрытием
+poetry run python -m pytest tests/ --cov=src --cov-report=term-missing
+
+# Запуск конкретного модуля тестов
+poetry run python -m pytest tests/unit/core/ --cov=src
+
+# Запуск с детальным выводом
+poetry run python -m pytest tests/ -v
+```
+
+### Структура тестов
+
+```
+tests/
+├── unit/                 # Модульные тесты
+│   ├── core/            # Тесты ядра приложения
+│   │   ├── test_config_settings.py
+│   │   ├── test_exceptions.py
+│   │   ├── test_logger.py
+│   │   └── test_modules.py
+│   ├── models/          # Тесты моделей
+│   │   └── test_base_mixins.py
+│   ├── schemas/         # Тесты схем
+│   └── api/             # Тесты API
+└── integration/         # Интеграционные тесты
+```
+
+Тесты покрывают все ключевые модули
+
+## Переменные окружения (актуальные)
+
+Файл `.env` должен содержать следующие переменные:
+
+```dotenv
+# Для Docker совместимости
+PG_USER=tickets
+PG_PASSWD=test
+PG_DB_NAME=tickets_system_db
+
+# Для приложения (с префиксами)
+DATABASE_PG_USER=tickets
+DATABASE_PG_PASSWORD=test
+DATABASE_PG_DB_NAME=tickets_system_db
+```
+
 ## Полезные материалы
 
 [Пишем и тестируем миграции БД с Alembic](https://habr.com/ru/company/yandex/blog/511892/)  
-[Poetry: документация](https://python-poetry.org/docs/)
+[Poetry: документация](https://python-poetry.org/docs/)  
+[FastAPI документация](https://fastapi.tiangolo.com/)  
+[Pydantic v2 документация](https://docs.pydantic.dev/latest/)

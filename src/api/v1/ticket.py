@@ -52,22 +52,17 @@ async def list_tickets(
     page: Page = Depends(),
     db: Session = Depends(get_postgresql),
     service: TicketService = Depends(get_ticket_service),
-) -> Optional[List[Ticket]]:
+) -> List[Ticket]:
     """Get tickets list
 
     Args:
         page (Page, optional): page size and page limits
 
     Returns:
-        Optional[List[Ticket]]: List of tickets
+        List[Ticket]: List of tickets (empty list if no tickets found)
     """
     tickets = await service.list(db, skip=page.number, limit=page.size)
-    if not tickets:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail="tickets not found"
-        )
-
-    return tickets  # type: ignore
+    return tickets or []  # type: ignore
 
 
 @router.post("/", response_model=TicketFull)

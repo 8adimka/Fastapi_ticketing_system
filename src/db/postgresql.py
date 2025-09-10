@@ -6,9 +6,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from src.core.config.app_settings import AppSettings
+from src.core.config.app_settings import get_settings
 
-app_config = AppSettings()
+app_config = get_settings()
 database: Optional[Database] = None
 
 engine = create_engine(app_config.db.pg_dsn)

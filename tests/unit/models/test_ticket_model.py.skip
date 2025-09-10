@@ -1,0 +1,62 @@
+from datetime import datetime
+from uuid import UUID
+
+from src.models.tickets import Ticket, TicketStatus
+
+
+class TestTicketModel:
+    """Test cases for Ticket model"""
+
+    def test_ticket_creation(self):
+        """Test that Ticket model can be created with required fields"""
+        ticket = Ticket()
+        ticket.title = "Test Ticket"
+        ticket.description = "Test description"
+        ticket.email = "test@example.com"
+        ticket.status = TicketStatus.OPEN
+        ticket.created_by = "test_user"
+        ticket.updated_by = "test_user"
+
+        assert ticket.title == "Test Ticket"
+        assert ticket.description == "Test description"
+        assert ticket.email == "test@example.com"
+        assert ticket.status == TicketStatus.OPEN
+        assert ticket.created_by == "test_user"
+        assert ticket.updated_by == "test_user"
+        assert isinstance(ticket.id, UUID)
+        assert isinstance(ticket.created_at, datetime)
+        assert isinstance(ticket.updated_at, datetime)
+
+    def test_ticket_status_enum(self):
+        """Test TicketStatus enum values"""
+        assert TicketStatus.OPEN.value == "open"
+        assert TicketStatus.CLOSED.value == "closed"
+        assert TicketStatus.ANSWERED.value == "answered"
+        assert TicketStatus.WAIT_ANSWER.value == "wait_answer"
+
+    def test_ticket_status_has_value_method(self):
+        """Test TicketStatus.has_value method"""
+        assert TicketStatus.has_value("open") is True
+        assert TicketStatus.has_value("closed") is True
+        assert TicketStatus.has_value("answered") is True
+        assert TicketStatus.has_value("wait_answer") is True
+        assert TicketStatus.has_value("invalid") is False
+
+    def test_ticket_default_status(self):
+        """Test that Ticket gets OPEN status by default"""
+        ticket = Ticket()
+        ticket.title = "Test Ticket"
+        ticket.email = "test@example.com"
+        ticket.created_by = "test_user"
+        ticket.updated_by = "test_user"
+        assert ticket.status == TicketStatus.OPEN
+
+    def test_ticket_repr(self):
+        """Test Ticket string representation"""
+        ticket = Ticket()
+        ticket.title = "Test Ticket"
+        ticket.email = "test@example.com"
+        ticket.created_by = "test_user"
+        ticket.updated_by = "test_user"
+        assert "Ticket" in str(ticket)
+        assert str(ticket.id) in str(ticket)
